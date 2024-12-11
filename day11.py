@@ -1,26 +1,36 @@
-from aoc import get_input, get_input_lines, uncurry
-from functools import partial, reduce
-from itertools import product
+"""Solution for day 11 part 1 and 2."""
+from aoc import get_input
 
 
-def format_input(inp: str):
+Stone = int
+Amount = int
+Stones = dict[Stone, Amount]
+
+
+def format_input(inp: str) -> Stones:
+    """Formats the input."""
     inp = list(map(int, inp.split()))
     return {k: 1 for k in inp}
 
 
-def str_to_int(string: str):
+def str_to_int(string: str) -> int:
+    """Helper function to turn str to int."""
     string = string.lstrip('0')
     return int(string) if string else 0
 
 
-def dict_add(dic, key, val):
+def dict_add(dic: Stones, key: Stone, val: Amount) -> None:
+    """Adds key and val to dic.
+    If key is in dic, sum the current val with new val.
+    """
     if key in dic:
         dic[key] += val
     else:
         dic[key] = val
 
 
-def solve(stones: dict[int, int], iters: int = 25):
+def solve(stones: Stones, iters: int = 25) -> int:
+    """Solves part 1 and part 2, just change iters to 75 for part 2."""
     next_gen = {}
     for stone, amount in stones.items():
         if stone == 0:
@@ -39,10 +49,6 @@ def solve(stones: dict[int, int], iters: int = 25):
         return solve(next_gen, iters)
     else:
         return sum(next_gen.values())
-
-
-def solve2(inp):
-    pass
 
 
 if __name__ == '__main__':
