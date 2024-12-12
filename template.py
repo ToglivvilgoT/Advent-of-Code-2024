@@ -16,7 +16,7 @@ def solve2(inp):
 
 
 if __name__ == '__main__':
-    inp = format_input(get_input('day11.txt'))
+    inp = format_input(get_input('day.txt'))
     res = solve(inp)
     print(res)
     res = solve2(inp)
