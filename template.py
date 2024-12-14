@@ -1,4 +1,4 @@
-from aoc import get_input, get_input_lines, uncurry
+from aoc import get_input, get_input_lines, uncurry, in_bounds, get_neighbours
 from functools import partial, reduce
 from itertools import product
 
