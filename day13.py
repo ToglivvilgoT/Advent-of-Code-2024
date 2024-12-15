@@ -2,6 +2,7 @@ from aoc import get_input, get_input_lines, uncurry, in_bounds, get_neighbours
 from functools import partial, reduce
 from itertools import product
 from math import gcd
+import numpy
 
 
 def format_input(inp: str):
@@ -66,30 +67,27 @@ def eu_solve(a, b):
 
 def eucledes(machine):
     (ax, ay), (bx, by), (x, y) = machine
-    gcd_x = gcd(ax, bx) 
-    gcd_y = gcd(ay, by)
-    if (x % gcd_x != 0) or (y % gcd_y != 0):
+    equations = numpy.array([
+        [ax, bx],
+        [ay, by],
+    ])
+    solution = numpy.array([x, y])
+    result = numpy.linalg.solve(equations, solution).astype(int)
+    
+    test1 = equations[0][0] * result[0] + equations[0][1] * result[1]
+    test2 = equations[1][0] * result[0] + equations[1][1] * result[1]
+    if test1 == x and test2 == y:
+        return result[0] * 3 + result[1]
+    else:
+        print(test1 - x, test2 - y)
         return 0
-    ax //= gcd_x
-    bx //= gcd_x
-    x //= gcd_x
-    ay //= gcd_y
-    by //= gcd_y
-    y //= gcd_y
-    if ax < bx:
-        b0_x, a0_x = eu_solve(bx, ax)
-    else:
-        a0_x, b0_x = eu_solve(ax, bx)
-    if ay < by:
-        b0_y, a0_y = eu_solve(by, ay)
-    else:
-        a0_y, b0_y = eu_solve(ay, by)
 
 
 def solve2(machines):
     result = 0
     for machine in machines:
-        print(eucledes(machine))
+        result += eucledes(machine)
+    return result
 
 
 if __name__ == '__main__':
