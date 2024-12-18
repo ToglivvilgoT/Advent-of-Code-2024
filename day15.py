@@ -24,7 +24,7 @@ def format_input(inp: str) -> tuple[Warehouse, Moves, Position]:
                 return warehouse, moves, (x, y)
 
 
-def try_push(warehouse: Warehouse, x: int, y: int, dx: int, dy: int) -> Position | False:
+def try_push(warehouse: Warehouse, x: int, y: int, dx: int, dy: int) -> Position | Literal[False]:
     """Tries to push box at (x, y) in direction (dx, dy). If push is possible,
     return the coordinate of where the last box in the push chain would land,
     if not possible, return False.
