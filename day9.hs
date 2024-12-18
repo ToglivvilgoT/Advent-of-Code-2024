@@ -1,5 +1,6 @@
 import Data.Char (digitToInt)
 import GHC.Num (integerFromInt)
+import qualified Data.Set as Set
 
 
 repeatTimes :: a -> Int -> [a]
@@ -63,8 +64,17 @@ insert2 [] _ = []
 insert2 lst [] = lst
 insert2 lst (x:xs) = insert2 (tryInsert lst x) xs
 
-solve2 :: String -> [(Int, Int)]
-solve2 input = insert2 inputFormated $ reverse inputFormated
+checksumFile :: Int -> (Int, Int) -> Int
+checksumFile position (index, size) = sum [position .. position + size - 1] * index
+
+checksum2 :: [(Int, Int)] -> Set.Set (Int, Int) -> Int -> Int
+checksum2 [] _ _ = 0
+checksum2 (x : xs) checked position
+    | isFree x || Set.member x checked = checksum2 xs checked (position + snd x)
+    | otherwise                        = checksumFile position x + checksum2 xs (Set.insert x checked) (position + snd x)
+
+solve2 :: String -> Int
+solve2 input = checksum2 (insert2 inputFormated $ reverse inputFormated) Set.empty 0
     where
         inputFormated = formatInput2 input
 
