@@ -1,10 +1,19 @@
-from aoc import get_input, get_input_lines, uncurry, in_bounds, get_neighbours
-from functools import partial, reduce
-from itertools import product
+"""Solution for day 15."""
+from aoc import get_input
 from queue import Queue
+from typing import Literal
 
 
-def format_input(inp: str):
+Position = tuple[int, int]
+Tile = Literal['.', '#', 'O']
+Warehouse = list[list[Tile]]
+WideTile = Literal['.', '#', '[', ']']
+WideWarehouse = list[list[WideTile]]
+Moves = str  # Valid characters in Moves are '<', '>', 'v' and '^'.
+
+
+def format_input(inp: str) -> tuple[Warehouse, Moves, Position]:
+    """Formats input and returns it."""
     warehouse, moves = inp.split('\n\n')
     moves = moves.replace('\n', '')
     warehouse = list(map(list, warehouse.splitlines()))
@@ -15,7 +24,11 @@ def format_input(inp: str):
                 return warehouse, moves, (x, y)
 
 
-def try_push(warehouse, x, y, dx, dy):
+def try_push(warehouse: Warehouse, x: int, y: int, dx: int, dy: int) -> Position | False:
+    """Tries to push box at (x, y) in direction (dx, dy). If push is possible,
+    return the coordinate of where the last box in the push chain would land,
+    if not possible, return False.
+    """
     new_x = x + dx
     new_y = y + dy
     match warehouse[new_y][new_x]:
@@ -27,7 +40,10 @@ def try_push(warehouse, x, y, dx, dy):
             return try_push(warehouse, new_x, new_y, dx, dy)
 
 
-def box_coord_sum(warehouse, box='O'):
+def box_coord_sum(warehouse: Warehouse | WideWarehouse, box: str = 'O') -> int:
+    """Turn a warehouse into the answer.
+    This is done by iterating over all boxes and adding 100 * y + x for each.
+    """
     answer = 0
     for y, row in enumerate(warehouse):
         for x, tile in enumerate(row):
@@ -44,7 +60,8 @@ MOVES2DIR = {
     }
 
 
-def solve(warehouse: list[str], moves: str, robo_pos: tuple[int, int]):
+def solve(warehouse: Warehouse, moves: Moves, robo_pos: Position) -> int:
+    """Solves part 1 and returns the answer."""
     for move in moves:
         vel = MOVES2DIR[move]
         x, y = robo_pos
@@ -63,7 +80,8 @@ def solve(warehouse: list[str], moves: str, robo_pos: tuple[int, int]):
     return box_coord_sum(warehouse)
 
 
-def widen(warehouse, robo_pos):
+def widen(warehouse: Warehouse, robo_pos: Position) -> WideWarehouse:
+    """widens a warehouse, used for part 2."""
     thicc_warehouse = []
     for row in warehouse:
         thicc_row = []
@@ -82,7 +100,11 @@ def widen(warehouse, robo_pos):
     return thicc_warehouse, (robo_pos[0] * 2, robo_pos[1])
 
 
-def try_push_horizontal(warehouse, x, y, dx):
+def try_push_horizontal(warehouse: WideWarehouse, x: int, y: int, dx: int) -> bool:
+    """Tries to push a box at (x, y) in direction (dx, 0).
+    If successful: returns True and updates all boxes position in warehouse,
+    else: return False.
+    """
     new_x = x + 2 * dx
     match warehouse[y][new_x]:
         case '.':
@@ -102,11 +124,16 @@ def try_push_horizontal(warehouse, x, y, dx):
                 return False
 
 
-def try_push_vertical(warehouse, x, y, dy):
+def try_push_vertical(warehouse: WideWarehouse, x: int, y: int, dy: int) -> bool:
+    """Tries to push box at (x, y) in direction (0, dy).
+    If successful: returns True and updates all boxes positions,
+    else: return False.
+    """
     pushes = []
     que = Queue()
     que.put_nowait((x, y))
     pushes.append((x, y))
+    # Check if the left or right side of the box was pushed.
     if warehouse[y][x] == '[':
         que.put_nowait((x + 1, y))
         pushes.append((x + 1, y))
@@ -135,13 +162,15 @@ def try_push_vertical(warehouse, x, y, dy):
                     que.put_nowait((x - 1, y))
                     pushes.append((x - 1, y))
     
+    # iterates backwards to avoid boxes overwriting each other.
     for x, y in reversed(pushes):
         warehouse[y + dy][x] = warehouse[y][x]
         warehouse[y][x] = '.'
     return True
 
 
-def solve2(warehouse, moves, robo_pos):
+def solve2(warehouse: WideWarehouse, moves: Moves, robo_pos: Position) -> int:
+    """Solves part 2 and return the answer."""
     for move in moves:
         vel = MOVES2DIR[move]
         x, y = robo_pos
