@@ -1,7 +1,6 @@
 """Solution for day 18."""
-from aoc import get_input, get_input_lines, uncurry, in_bounds, get_neighbours
-from functools import partial, reduce
-from itertools import product
+from aoc import get_input, uncurry, in_bounds, get_neighbours
+from functools import partial
 from queue import SimpleQueue
 
 
