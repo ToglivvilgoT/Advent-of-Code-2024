@@ -1,11 +1,17 @@
-from aoc import get_input, get_input_lines, uncurry, in_bounds, get_neighbours
-from functools import partial, reduce
-from itertools import product
+"""Solution for day 14."""
+from aoc import get_input
+from functools import reduce
 import pygame
 pygame.display.set_mode((101*4, 103*4))
 
 
-def format_input(inp: str):
+Position = tuple[int, int]
+Velocity = tuple[int, int]
+Robot = tuple[Position, Velocity]
+
+
+def format_input(inp: str) -> list[Robot]:
+    """Formats input and returns it."""
     formated = []
     lines = inp.splitlines()
     for line in lines:
@@ -18,7 +24,11 @@ def format_input(inp: str):
     return formated
 
 
-def update_positions(robots, width, height, iters):
+def update_positions(robots: list[Robot], width: int, height: int, iters: int) -> list[Robot]:
+    """Return an updated list of robots where each position is updated
+    to where it would be after iters steps. (iters can be negative).
+    width and hight is the size of the map.
+    """
     new_robots = []
     for (x, y), (dx, dy) in robots:
         x = (x + dx * iters) % width
@@ -27,7 +37,10 @@ def update_positions(robots, width, height, iters):
     return new_robots
 
 
-def quadrant_count(robots, width, height):
+def quadrant_count(robots: list[Robot], width: int, height: int):
+    """Return the product of the amount of robots in each quadrant of the map.
+    width and height is the size of the map.
+    """
     quadrants = [0, 0, 0, 0]
     half_width = width // 2
     half_height = height // 2
@@ -45,11 +58,19 @@ def quadrant_count(robots, width, height):
     return reduce(lambda a, b: a * b, quadrants, 1)
 
 
-def solve(robots, width, height, iters):
+def solve(robots: list[Robot], width: int, height: int, iters: int) -> int:
+    """Solves part 1 and returns the answer.
+    width and height is the size of the map.
+    iters is how many steps the robots should take.
+    """
     return quadrant_count(update_positions(robots, width, height, iters), width, height)
 
 
-def solve2(robots, width, height):
+def solve2(robots: list[Robot], width: int, height: int) -> int:
+    """'solves' part 2 by starting a pygame window and letting you step through
+    the robots moving until you reach the christmas tree.
+    Very manual, very banger.
+    """
     running = True
     iters = 0
     surface = pygame.surface.Surface((101, 103))
@@ -63,6 +84,7 @@ def solve2(robots, width, height):
                     robots = update_positions(robots, width, height, -1)
                     iters -= 1
                 if event.key == pygame.K_w:
+                    # 101 is used here because I notised the robots tended to clump up each 101 iterations.
                     robots = update_positions(robots, width, height, 101)
                     iters += 101
                 if event.key == pygame.K_s:
