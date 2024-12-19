@@ -1,4 +1,4 @@
-from functools import partial
+from functools import partial, cache
 
 
 def test_match():
@@ -65,5 +65,24 @@ def test_kwarg_arg():
     foo_bar('hej', 'då', name='Janson', surname='Jacob')
 
 
+def get_incrementor():
+    count = 0
+    @cache
+    def increase_by(n):
+        nonlocal count
+        count += n
+        return count
+    return increase_by
+
+
+def test_cache():
+    counter = get_incrementor()
+    print(counter(3))
+    print(counter(4))
+    print(counter(3))
+    print(counter(4))
+    print(counter(0))
+
+
 if __name__ == '__main__':
-    test_kwarg_arg()
+    test_cache()
