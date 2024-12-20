@@ -1,4 +1,5 @@
-from functools import partial, cache
+from functools import partial, cache, reduce
+from collections import Counter, defaultdict
 
 
 def test_match():
@@ -84,5 +85,20 @@ def test_cache():
     print(counter(0))
 
 
+def test_counter():
+    numbers = []
+    for line in open('day18.txt').readlines():
+        numbers += list(map(int, line.split(',')))
+    counter = Counter(numbers)
+    print(counter.most_common(3))
+    print(counter.total())
+
+
+def test_default_dict():
+    dic = defaultdict(lambda: 0)
+    dic['hi'] += 1
+    print(dic.items())
+
+
 if __name__ == '__main__':
-    test_cache()
+    test_default_dict()
