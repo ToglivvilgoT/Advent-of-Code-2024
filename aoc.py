@@ -36,3 +36,12 @@ def get_input_lines(file_path: str) -> list[str]:
     """Reads all lines from file."""
     with open(file_path) as file:
         return file.readlines()
+
+
+def sign(n):
+    if n < 0:
+        return -1
+    elif n > 0:
+        return 1
+    else:
+        return 0

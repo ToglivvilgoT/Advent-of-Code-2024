@@ -92,6 +92,10 @@ def test_counter():
     counter = Counter(numbers)
     print(counter.most_common(3))
     print(counter.total())
+    counter.clear()
+    counter['a'] += 1
+    counter.update(['a', 'b', 'c'])
+    print(counter.most_common(3))
 
 
 def test_default_dict():
@@ -101,4 +105,4 @@ def test_default_dict():
 
 
 if __name__ == '__main__':
-    test_default_dict()
+    test_counter()
